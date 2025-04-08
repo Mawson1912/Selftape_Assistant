@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import AVFoundation
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
@@ -83,6 +84,8 @@ struct SceneDetailView: View {
     @State private var newLineText = ""
     @State private var isUserLine = true
     
+    @StateObject private var audioManager = AudioManager()
+    
     var body: some View {
         VStack {
             Text("Scene: \(scene.name)")
@@ -96,24 +99,68 @@ struct SceneDetailView: View {
                         .italic()
                 } else {
                     ForEach(scene.lines.sorted(by: { $0.order < $1.order }), id: \.id) { line in
-                        HStack {
-                            Image(systemName: line.isUserLine ? "person" : "person.2")
-                                .foregroundColor(line.isUserLine ? .blue : .green)
-                            
-                            VStack(alignment: .leading) {
-                                Text(line.isUserLine ? "Me" : "Reader")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
-                                Text(line.text.isEmpty ? "(No text yet)" : line.text)
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Image(systemName: line.isUserLine ? "person" : "person.2")
+                                    .foregroundColor(line.isUserLine ? .blue : .green)
+                                
+                                VStack(alignment: .leading) {
+                                    Text(line.isUserLine ? "Me" : "Reader")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                    Text(line.text.isEmpty ? "(No text yet)" : line.text)
+                                }
+                                
+                                Spacer()
+                                
+                                if audioManager.isRecording && audioManager.recordingLine?.id == line.id {
+                                    Image(systemName: "waveform")
+                                        .foregroundColor(.red)
+                                        .padding(.horizontal, 4)
+                                }
                             }
+                            
+                            HStack {
+                                Button(action: {
+                                    if audioManager.isRecording {
+                                        audioManager.stopRecording()
+                                    } else {
+                                        audioManager.startRecording(for: line)
+                                    }
+                                }) {
+                                    Label(
+                                        audioManager.isRecording && audioManager.recordingLine?.id == line.id ? "Stop" : "Record", 
+                                        systemImage: audioManager.isRecording && audioManager.recordingLine?.id == line.id ? "stop.circle" : "record.circle"
+                                    )
+                                    .padding(6)
+                                    .background(
+                                        audioManager.isRecording && audioManager.recordingLine?.id == line.id ? Color.red : Color.blue
+                                    )
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                                }
+                                .disabled(audioManager.isRecording && audioManager.recordingLine?.id != line.id)
+                                
+                                if line.audioFilePath != nil {
+                                    Button(action: {
+                                        audioManager.playRecording(for: line)
+                                    }) {
+                                        Label("Play", systemImage: "play.circle")
+                                            .padding(6)
+                                            .background(Color.green)
+                                            .foregroundColor(.white)
+                                            .cornerRadius(8)
+                                    }
+                                    .disabled(audioManager.isRecording)
+                                }
+                            }
+                            .padding(.top, 4)
                         }
                         .padding(.vertical, 4)
                         .contextMenu {
                             Button(role: .destructive) {
-                                // Get the index of this line in the ordered array
                                 let orderedLines = scene.lines.sorted(by: { $0.order < $1.order })
                                 if let index = orderedLines.firstIndex(where: { $0.id == line.id }) {
-                                    // Call the existing delete function
                                     deleteLines(at: IndexSet([index]))
                                 }
                             } label: {
@@ -136,6 +183,7 @@ struct SceneDetailView: View {
                     .cornerRadius(8)
             }
             .padding()
+            .disabled(audioManager.isRecording)
         }
         .sheet(isPresented: $isShowingAddLineSheet) {
             NavigationView {
@@ -165,6 +213,13 @@ struct SceneDetailView: View {
                 )
             }
         }
+        .onAppear {
+            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                if !granted {
+                    print("Microphone permission not granted")
+                }
+            }
+        }
     }
     
     private func addNewLine() {
@@ -186,17 +241,14 @@ struct SceneDetailView: View {
     }
     
     private func deleteLines(at offsets: IndexSet) {
-        // Get the lines in order
         let orderedLines = scene.lines.sorted(by: { $0.order < $1.order })
         
-        // Delete the selected lines
         for index in offsets {
             let lineToDelete = orderedLines[index]
             scene.lines.removeAll(where: { $0.id == lineToDelete.id })
             modelContext.delete(lineToDelete)
         }
         
-        // Update the order of remaining lines
         let remainingLines = scene.lines.sorted(by: { $0.order < $1.order })
         for (index, line) in remainingLines.enumerated() {
             line.order = index

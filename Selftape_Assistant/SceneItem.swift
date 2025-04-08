@@ -10,6 +10,7 @@ final class LineItem {
     var text: String // Will hold transcribed text
     var isUserLine: Bool // true = user line, false = reader line
     var dateCreated: Date
+    var audioFilePath: String? // Path to the recorded audio file
     
     // Relationship to parent scene
     @Relationship(inverse: \SceneItem.lines) var scene: SceneItem?
@@ -20,6 +21,7 @@ final class LineItem {
         self.text = text
         self.isUserLine = isUserLine
         self.dateCreated = Date()
+        self.audioFilePath = nil
     }
 }
 

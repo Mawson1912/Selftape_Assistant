@@ -14,6 +14,7 @@
 		B94EA7872DA41E9E005FB50E /* Selftape_AssistantTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B94EA7862DA41E9E005FB50E /* Selftape_AssistantTests.swift */; };
 		B94EA7912DA41E9E005FB50E /* Selftape_AssistantUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B94EA7902DA41E9E005FB50E /* Selftape_AssistantUITests.swift */; };
 		B94EA7932DA41E9E005FB50E /* Selftape_AssistantUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B94EA7922DA41E9E005FB50E /* Selftape_AssistantUITestsLaunchTests.swift */; };
+		B96707F42DA5735200154590 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96707F32DA5735200154590 /* AudioManager.swift */; };
 		B9AF3A032DA42E81001D3306 /* SceneItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9AF3A022DA42E81001D3306 /* SceneItem.swift */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +46,7 @@
 		B94EA78C2DA41E9E005FB50E /* Selftape_AssistantUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Selftape_AssistantUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B94EA7902DA41E9E005FB50E /* Selftape_AssistantUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Selftape_AssistantUITests.swift; sourceTree = "<group>"; };
 		B94EA7922DA41E9E005FB50E /* Selftape_AssistantUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Selftape_AssistantUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		B96707F32DA5735200154590 /* AudioManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
 		B9AF3A022DA42E81001D3306 /* SceneItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -96,6 +98,7 @@
 		B94EA7722DA41E9C005FB50E /* Selftape_Assistant */ = {
 			isa = PBXGroup;
 			children = (
+				B96707F32DA5735200154590 /* AudioManager.swift */,
 				B9AF3A022DA42E81001D3306 /* SceneItem.swift */,
 				B94EA7732DA41E9C005FB50E /* Selftape_AssistantApp.swift */,
 				B94EA7752DA41E9C005FB50E /* ContentView.swift */,
@@ -262,6 +265,7 @@
 			files = (
 				B94EA7762DA41E9C005FB50E /* ContentView.swift in Sources */,
 				B9AF3A032DA42E81001D3306 /* SceneItem.swift in Sources */,
+				B96707F42DA5735200154590 /* AudioManager.swift in Sources */,
 				B94EA7742DA41E9C005FB50E /* Selftape_AssistantApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -429,6 +433,8 @@
 				DEVELOPMENT_TEAM = 5Y44N2LU89;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app needs access to your microphone to record audio for scenes.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "This app needs speech recognition to transcribe your recorded lines.\"";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -458,6 +464,8 @@
 				DEVELOPMENT_TEAM = 5Y44N2LU89;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app needs access to your microphone to record audio for scenes.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "This app needs speech recognition to transcribe your recorded lines.\"";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -1,0 +1,3 @@
+/* Privacy descriptions */
+"NSMicrophoneUsageDescription" = "This app needs access to your microphone to record audio for scenes.";
+"NSSpeechRecognitionUsageDescription" = "This app needs speech recognition to transcribe your recorded lines."; 
