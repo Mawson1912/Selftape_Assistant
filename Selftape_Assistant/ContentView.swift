@@ -27,6 +27,13 @@ struct ContentView: View {
                                 .foregroundColor(.gray)
                         }
                     }
+                    .contextMenu {
+                        Button(role: .destructive) {
+                            modelContext.delete(scene)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
                 }
                 .onDelete(perform: deleteScenes)
             }
@@ -101,6 +108,18 @@ struct SceneDetailView: View {
                             }
                         }
                         .padding(.vertical, 4)
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                // Get the index of this line in the ordered array
+                                let orderedLines = scene.lines.sorted(by: { $0.order < $1.order })
+                                if let index = orderedLines.firstIndex(where: { $0.id == line.id }) {
+                                    // Call the existing delete function
+                                    deleteLines(at: IndexSet([index]))
+                                }
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                     }
                     .onDelete(perform: deleteLines)
                 }
