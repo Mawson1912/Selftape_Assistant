@@ -18,7 +18,7 @@ struct ContentView: View {
         NavigationView {
             List {
                 ForEach(scenes, id: \.id) { scene in
-                    NavigationLink(destination: Text(scene.name)) {
+                    NavigationLink(destination: SceneDetailView(scene: scene)) {
                         VStack(alignment: .leading) {
                             Text(scene.name)
                                 .font(.headline)
@@ -69,7 +69,123 @@ struct ContentView: View {
     }
 }
 
+struct SceneDetailView: View {
+    var scene: SceneItem
+    @Environment(\.modelContext) private var modelContext
+    @State private var isShowingAddLineSheet = false
+    @State private var newLineText = ""
+    @State private var isUserLine = true
+    
+    var body: some View {
+        VStack {
+            Text("Scene: \(scene.name)")
+                .font(.title)
+                .padding()
+            
+            List {
+                if scene.lines.isEmpty {
+                    Text("No lines added yet")
+                        .foregroundColor(.gray)
+                        .italic()
+                } else {
+                    ForEach(scene.lines.sorted(by: { $0.order < $1.order }), id: \.id) { line in
+                        HStack {
+                            Image(systemName: line.isUserLine ? "person" : "person.2")
+                                .foregroundColor(line.isUserLine ? .blue : .green)
+                            
+                            VStack(alignment: .leading) {
+                                Text(line.isUserLine ? "Me" : "Reader")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                Text(line.text.isEmpty ? "(No text yet)" : line.text)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    .onDelete(perform: deleteLines)
+                }
+            }
+            
+            Button(action: {
+                isShowingAddLineSheet = true
+            }) {
+                Label("Add Line", systemImage: "plus")
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+            }
+            .padding()
+        }
+        .sheet(isPresented: $isShowingAddLineSheet) {
+            NavigationView {
+                Form {
+                    Section(header: Text("Line Type")) {
+                        Picker("Line Type", selection: $isUserLine) {
+                            Text("Me").tag(true)
+                            Text("Reader").tag(false)
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                    }
+                    
+                    Section(header: Text("Line Text")) {
+                        TextField("Enter line text", text: $newLineText)
+                    }
+                }
+                .navigationTitle("Add New Line")
+                .navigationBarItems(
+                    leading: Button("Cancel") {
+                        isShowingAddLineSheet = false
+                        resetForm()
+                    },
+                    trailing: Button("Add") {
+                        addNewLine()
+                        isShowingAddLineSheet = false
+                    }
+                )
+            }
+        }
+    }
+    
+    private func addNewLine() {
+        let newLine = LineItem(
+            order: scene.lines.count,
+            text: newLineText,
+            isUserLine: isUserLine
+        )
+        
+        newLine.scene = scene
+        scene.lines.append(newLine)
+        
+        resetForm()
+    }
+    
+    private func resetForm() {
+        newLineText = ""
+        isUserLine = true
+    }
+    
+    private func deleteLines(at offsets: IndexSet) {
+        // Get the lines in order
+        let orderedLines = scene.lines.sorted(by: { $0.order < $1.order })
+        
+        // Delete the selected lines
+        for index in offsets {
+            let lineToDelete = orderedLines[index]
+            scene.lines.removeAll(where: { $0.id == lineToDelete.id })
+            modelContext.delete(lineToDelete)
+        }
+        
+        // Update the order of remaining lines
+        let remainingLines = scene.lines.sorted(by: { $0.order < $1.order })
+        for (index, line) in remainingLines.enumerated() {
+            line.order = index
+        }
+    }
+}
+
 #Preview {
     ContentView()
-        .modelContainer(for: SceneItem.self, inMemory: true)
+        .modelContainer(for: [SceneItem.self, LineItem.self], inMemory: true)
 }

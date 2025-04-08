@@ -13,6 +13,7 @@ struct Selftape_AssistantApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             SceneItem.self,
+            LineItem.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
